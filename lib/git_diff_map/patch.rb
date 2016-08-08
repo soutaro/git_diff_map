@@ -8,6 +8,7 @@
 
 class GitDiffMap
   class Patch < GitDiffParser::Patch
+    RANGE_INFORMATION_LINE = /^@@ -(?<original_base_line>\d+),\d+ \+(?<new_base_line>\d+),/
     ADDED_LINE   = -> (line) { line.start_with?('+') && line !~ /^\+\+\+/ }
     REMOVED_LINE = -> (line) { line.start_with?('-') && line !~ /^\-\-\-/ }
 
@@ -19,33 +20,33 @@ class GitDiffMap
 
     # @return [Array<Line>] changed lines
     def changed_lines
-      line_number = 0
-      removed_line_offset = 0
+      original_line = 0
+      new_line = 0
 
       lines.each_with_index.inject([]) do |lines, (content, patch_position)|
         case content
         when RANGE_INFORMATION_LINE
-          line_number = Regexp.last_match[:line_number].to_i
-          removed_line_offset = 0
+          original_line = Regexp.last_match[:original_base_line].to_i
+          new_line = Regexp.last_match[:new_base_line].to_i
         when ADDED_LINE
           line = Line.new(
             content: content,
-            number: line_number,
+            number: new_line,
             patch_position: patch_position
           )
           lines << line
-          line_number += 1
-          removed_line_offset -= 1
+          new_line += 1
         when REMOVED_LINE
           line = Line.new(
             content: content,
-            number: line_number + removed_line_offset,
+            number: original_line,
             patch_position: patch_position
           )
           lines << line
-          removed_line_offset +=1
+          original_line += 1
         when NOT_REMOVED_LINE
-          line_number += 1
+          original_line += 1
+          new_line += 1
         end
 
         lines
