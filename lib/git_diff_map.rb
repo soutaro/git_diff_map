@@ -3,27 +3,10 @@ require 'git_diff_map/line'
 require 'git_diff_map/patch'
 
 class GitDiffMap
-  DiffRange = Struct.new(:range, :type) do
-    def size
-      range.end - range.begin
-    end
-
-    def offset
-      case type
-      when :+
-        size
-      when :-
-        -size
-      end
-    end
-  end
-
   attr_reader :patch
-  attr_reader :ranges
 
   def initialize(patch:)
     @patch = patch
-    @ranges = []
   end
 
   def translate_new_to_original(new_line)
