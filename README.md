@@ -65,8 +65,8 @@ We can find some relations between lines:
 These relations can be calculated by this library as:
 
 ```rb
-patch = GitDiffMap::Patch.new(GitDiffParser::Patch.new(diff))
-map = GitDiffMap.new(patch: patch)
+diff = "..."
+map = GitDiffMap.parse(diff)
 
 map.translate_new_to_original(4)   # => 4
 map.translate_new_to_original(5)   # => nil
@@ -74,6 +74,13 @@ map.translate_new_to_original(6)   # => 6
 map.translate_original_to_new(14)  # => nil
 map.translate_new_to_original(15)  # => nil
 ```
+
+## API
+
+* `GitDiffMap#translate_new_to_original(line)`
+* `GitDiffMap#translate_original_to_new(line)`
+* `GitDiffMap#translate_new_lines_to_original_lines([lines])` `lines` must be sorted in ascending order
+* `GitDiffMap#translate_original_lines_to_new_lines([lines])` `lines` must be sorted in ascending order
 
 # Install
 
