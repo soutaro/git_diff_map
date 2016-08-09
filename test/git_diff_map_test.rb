@@ -128,7 +128,7 @@ index ff8419b..f913c3b 100644
   end
 
   it "handles multiple hunks" do
-    patch = GitDiffMap::Patch.new(GitDiffParser::Patch.new(<<-'EOS'))
+    map = GitDiffMap.parse(<<-'EOS')
 @@ -2,6 +2,7 @@ module Saddler
    module Reporter
      module Github
@@ -168,7 +168,6 @@ index ff8419b..f913c3b 100644
      end
    end
     EOS
-    map = GitDiffMap.new(patch: patch)
 
     # First hunk
     assert_equal [nil,5,6], map.translate_new_lines_to_original_lines([5,6,7])

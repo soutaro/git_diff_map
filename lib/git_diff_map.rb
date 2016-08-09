@@ -9,6 +9,11 @@ class GitDiffMap
     @patch = patch
   end
 
+  def self.parse(diff)
+    patch = GitDiffMap::Patch.new(GitDiffParser::Patch.new(diff))
+    self.new(patch: patch)
+  end
+
   def translate_new_to_original(new_line)
     translate_new_lines_to_original_lines([new_line]).first
   end
