@@ -19,10 +19,7 @@ index 51aec3b..ae23ea2 100644
       DIFF
       map = GitDiffMap.new(patch: patch)
 
-      assert_equal 1, map.translate_original_to_new(1)
-      assert_equal 2, map.translate_original_to_new(2)
-      assert_equal 4, map.translate_original_to_new(3)
-      assert_equal 7, map.translate_original_to_new(4)
+      assert_equal [1,2,4,7], map.translate_original_lines_to_new_lines([1,2,3,4])
     end
 
     it "handles deletion" do
@@ -42,13 +39,7 @@ index ff8419b..f913c3b 100644
       DIFF
       map = GitDiffMap.new(patch: patch)
 
-      assert_equal 1, map.translate_original_to_new(1)
-      assert_equal 2, map.translate_original_to_new(2)
-      assert_equal nil, map.translate_original_to_new(3)
-      assert_equal 3, map.translate_original_to_new(4)
-      assert_equal nil, map.translate_original_to_new(5)
-      assert_equal nil, map.translate_original_to_new(6)
-      assert_equal 4, map.translate_original_to_new(7)
+      assert_equal [1,2,nil,3,nil,nil,4], map.translate_original_lines_to_new_lines([1,2,3,4,5,6,7])
     end
 
     it "handles both" do
@@ -69,12 +60,7 @@ index ff8419b..f913c3b 100644
       DIFF
       map = GitDiffMap.new(patch: patch)
 
-      assert_equal 1, map.translate_original_to_new(1)
-      assert_equal 2, map.translate_original_to_new(2)
-      assert_equal nil, map.translate_original_to_new(3)
-      assert_equal 4, map.translate_original_to_new(4)
-      assert_equal nil, map.translate_original_to_new(5)
-      assert_equal 6, map.translate_original_to_new(6)
+      assert_equal [1,2,nil,4,nil,6], map.translate_original_lines_to_new_lines([1,2,3,4,5,6])
     end
   end
 
@@ -96,13 +82,7 @@ index 51aec3b..ae23ea2 100644
       DIFF
       map = GitDiffMap.new(patch: patch)
 
-      assert_equal 1, map.translate_new_to_original(1)
-      assert_equal 2, map.translate_new_to_original(2)
-      assert_equal nil, map.translate_new_to_original(3)
-      assert_equal 3, map.translate_new_to_original(4)
-      assert_equal nil, map.translate_new_to_original(5)
-      assert_equal nil, map.translate_new_to_original(6)
-      assert_equal 4, map.translate_new_to_original(7)
+      assert_equal [1,2,nil,3,nil,nil,4], map.translate_new_lines_to_original_lines([1,2,3,4,5,6,7])
     end
 
     it "handles deletion" do
@@ -122,10 +102,7 @@ index ff8419b..f913c3b 100644
       DIFF
       map = GitDiffMap.new(patch: patch)
 
-      assert_equal 1, map.translate_new_to_original(1)
-      assert_equal 2, map.translate_new_to_original(2)
-      assert_equal 4, map.translate_new_to_original(3)
-      assert_equal 7, map.translate_new_to_original(4)
+      assert_equal [1,2,4,7], map.translate_new_lines_to_original_lines([1,2,3,4])
     end
 
     it "handles both" do
@@ -146,12 +123,7 @@ index ff8419b..f913c3b 100644
       DIFF
       map = GitDiffMap.new(patch: patch)
 
-      assert_equal 1, map.translate_new_to_original(1)
-      assert_equal 2, map.translate_new_to_original(2)
-      assert_equal nil, map.translate_new_to_original(3)
-      assert_equal 4, map.translate_new_to_original(4)
-      assert_equal nil, map.translate_new_to_original(5)
-      assert_equal 6, map.translate_new_to_original(6)
+      assert_equal [1,2,nil,4,nil,6], map.translate_new_lines_to_original_lines([1,2,3,4,5,6])
     end
   end
 
@@ -199,29 +171,21 @@ index ff8419b..f913c3b 100644
     map = GitDiffMap.new(patch: patch)
 
     # First hunk
-    assert_equal nil, map.translate_new_to_original(5)
-    assert_equal 5, map.translate_new_to_original(6)
-    assert_equal 6, map.translate_new_to_original(7)
+    assert_equal [nil,5,6], map.translate_new_lines_to_original_lines([5,6,7])
 
     # Second hunk
-    assert_equal 13, map.translate_new_to_original(14)
-    assert_equal nil, map.translate_new_to_original(15)
-    assert_equal 15, map.translate_new_to_original(16)
+    assert_equal [13,nil,15], map.translate_new_lines_to_original_lines([14,15,16])
 
     # Third hunk
-    assert_equal 27, map.translate_new_to_original(28)
-    assert_equal 42, map.translate_new_to_original(29)
+    assert_equal [27,42], map.translate_new_lines_to_original_lines([28,29])
 
     # First hunk
     assert_equal 6, map.translate_original_to_new(5)
 
     # Second hunk
-    assert_equal nil, map.translate_original_to_new(14)
-    assert_equal 16, map.translate_original_to_new(15)
+    assert_equal [nil,16], map.translate_original_lines_to_new_lines([14,15])
 
     # Third hunk
-    assert_equal nil, map.translate_original_to_new(28)
-    assert_equal nil, map.translate_original_to_new(41)
-    assert_equal 29, map.translate_original_to_new(42)
+    assert_equal [nil,nil,29], map.translate_original_lines_to_new_lines([28,41,42])
   end
 end

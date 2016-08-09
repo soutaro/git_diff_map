@@ -27,38 +27,98 @@ class GitDiffMap
   end
 
   def translate_new_to_original(new_line)
+    translate_new_lines_to_original_lines([new_line]).first
+  end
+
+  def translate_new_lines_to_original_lines(lines)
+    results = []
+
+    all_changes = patch.changed_lines.dup
     offset = 0
 
-    patch.changed_lines.each do |line|
-      case line.type
-      when '-'
-        break if new_line + offset < line.number
-        offset += 1
-      when '+'
-        break if new_line < line.number
-        return nil if new_line == line.number
-        offset -= 1
+    lines.each do |new_line|
+      while true
+        if all_changes.empty?
+          results << new_line + offset
+          break
+        else
+          change = all_changes.first
+
+          case change.type
+          when '-'
+            if new_line + offset < change.number
+              results << new_line + offset
+              break
+            end
+
+            offset += 1
+          when '+'
+            if new_line < change.number
+              results << new_line + offset
+              break
+            end
+
+            if new_line == change.number
+              results << nil
+              break
+            end
+
+            offset -= 1
+          end
+
+          all_changes.shift
+        end
       end
     end
 
-    new_line + offset
+    results
   end
 
   def translate_original_to_new(original_line)
+    translate_original_lines_to_new_lines([original_line]).first
+  end
+
+  def translate_original_lines_to_new_lines(lines)
+    results = []
+
+    all_changes = patch.changed_lines.dup
     offset = 0
 
-    patch.changed_lines.each do |line|
-      case line.type
-      when '+'
-        break if original_line + offset < line.number
-        offset += 1
-      when '-'
-        break if original_line < line.number
-        return nil if original_line == line.number
-        offset -= 1
+    lines.each do |original_line|
+      while true
+        if all_changes.empty?
+          results << original_line + offset
+          break
+        else
+          change = all_changes.first
+
+          case change.type
+          when '+'
+            if original_line + offset < change.number
+              results << original_line + offset
+              break
+            end
+
+            offset += 1
+          when '-'
+            if original_line < change.number
+              results << original_line + offset
+              break
+            end
+
+            if original_line == change.number
+              results << nil
+              break
+            end
+
+            offset -= 1
+          end
+
+          all_changes.shift
+        end
       end
     end
 
-    original_line + offset
+    results
   end
 end
